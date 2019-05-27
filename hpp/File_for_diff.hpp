@@ -17,6 +17,7 @@ private:
     std::vector<value_type> _M_hashline;
     void _M_readfile()
     {
+        _M_hashline.clear();
         std::ifstream _M_file;
         _M_file.open(_M_filedir, std::ios::in);
         if (_M_file.good())

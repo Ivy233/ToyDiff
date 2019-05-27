@@ -26,6 +26,7 @@ private:
 private:
     void update()
     {
+        _M_same_line.clear();
         //LCS过程
         size_type size_A = A->size(), size_B = B->size();
         std::vector<std::vector<LCS_base>> _M_lcs;
