@@ -29,10 +29,6 @@ int main(int argc, char **argv)
     Folder A(filedir[0]), B(filedir[1]);
     link(A, B, results);
     for (LCS result : results)
-    {
-        result.print_same();
-        cout << endl
-             << endl;
-    }
+        result.print_diff();
     return 0;
 }

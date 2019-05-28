@@ -1,6 +1,18 @@
 #ifndef _LCS_IMPL_HPP_
 #define _LCS_IMPL_HPP_
 #include "LCS.hpp"
+#include <fstream>
+#include <iostream>
+using std::cout;
+using std::endl;
+LCS::LCS(const string &_filedir1, const string &_filedir2)
+{
+    _M_filedir[0] = _filedir1;
+    _M_filedir[1] = _filedir2;
+    _M_read_file(0);
+    _M_read_file(1);
+    _M_update();
+}
 void LCS::_M_read_file(const int &whichfile)
 {
     _M_hashline[whichfile].clear();
@@ -44,12 +56,15 @@ void LCS::_M_update()
 }
 void LCS::print_diff()
 {
+    bool flag = 0;
+    cout << "Compare " << _M_filedir[0] << " with " << _M_filedir[1] << ":" << endl;
     for (size_type i = 1, Al, Ar, Bl, Br; i < _M_same_line.size(); i++)
     {
         Ar = _M_same_line[i].first, Br = _M_same_line[i].second;
         Al = _M_same_line[i - 1].first, Bl = _M_same_line[i - 1].second;
         if (Ar - Al > 1 && Br - Bl != 1)
         {
+            flag = 1;
             cout << "modify ";
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1;
@@ -63,6 +78,7 @@ void LCS::print_diff()
         }
         else if (Ar - Al > 1 && Br - Bl == 1)
         {
+            flag = 1;
             cout << "delete ";
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1 << endl;
@@ -71,6 +87,7 @@ void LCS::print_diff()
         }
         else if (Ar - Al == 1 && Br - Bl > 1)
         {
+            flag = 1;
             cout << "add ";
             if (Br - Bl > 2)
                 cout << "line in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
@@ -78,6 +95,13 @@ void LCS::print_diff()
                 cout << "line in B:" << Bl + 1 << endl;
         }
     }
+    if (flag == 0)
+        cout << "Nothing different." << endl;
+}
+void LCS::print_same()
+{
+    for (pair<size_type, size_type> line : _M_same_line)
+        cout << line.first << " " << line.second << endl;
 }
 void LCS::swapfile()
 {
