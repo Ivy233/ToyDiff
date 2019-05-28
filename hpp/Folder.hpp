@@ -20,7 +20,7 @@ public:
     Folder(const string &filedir);
     void print_everything();
     bool is_only_file() const { return _M_only_file; }
-    friend void link(const Folder &A, const Folder &B, vector<LCS> &results);
+    friend void link(const Folder &A, const Folder &B, vector<LCS> &results, const int &_format);
 };
 #include "Folder.impl.hpp"
 #endif

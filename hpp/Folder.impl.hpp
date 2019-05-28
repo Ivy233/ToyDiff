@@ -62,18 +62,18 @@ void Folder::_M_update_ext(const string &dir)
         } while (_findnext(hfile, &fileinfo) == 0);
     }
 }
-void link(const Folder &A, const Folder &B, vector<LCS> &results)
+void link(const Folder &A, const Folder &B, vector<LCS> &results, const int &_format)
 {
     results.clear();
     if (A._M_only_file && B._M_only_file)
-        results.push_back(LCS(A._M_base_dir + A._M_ext_dirs[0], B._M_base_dir + B._M_ext_dirs[0]));
+        results.push_back(LCS(A._M_base_dir + A._M_ext_dirs[0], B._M_base_dir + B._M_ext_dirs[0], _format));
     else
     {
         for (string ext_dir : A._M_ext_dirs)
         {
             size_t pos = std::find(B._M_ext_dirs.begin(), B._M_ext_dirs.end(), ext_dir) - B._M_ext_dirs.begin();
             if (pos != B._M_ext_dirs.size())
-                results.push_back(LCS(A._M_base_dir + ext_dir, B._M_base_dir + B._M_ext_dirs[pos]));
+                results.push_back(LCS(A._M_base_dir + ext_dir, B._M_base_dir + B._M_ext_dirs[pos], _format));
             else
                 cout << "File in A: " << ext_dir << " not found." << endl;
         }

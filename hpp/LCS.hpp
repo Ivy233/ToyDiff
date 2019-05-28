@@ -29,11 +29,12 @@ private:
     string _M_filedir[2];
     vector<value_type> _M_hashline[2];
     vector<pair<size_type, size_type>> _M_same_line;
+    int _M_format;
     void _M_update();
     void _M_read_file(const int &file_switch);
 
 public:
-    LCS(const string &_filedir1, const string &_filedir2);
+    LCS(const string &_filedir1, const string &_filedir2, const int &_format);
     void print_same();
     void print_diff();
     void swapfile();

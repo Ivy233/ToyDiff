@@ -5,8 +5,9 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-LCS::LCS(const string &_filedir1, const string &_filedir2)
+LCS::LCS(const string &_filedir1, const string &_filedir2, const int &_format)
 {
+    _M_format = _format;
     _M_filedir[0] = _filedir1;
     _M_filedir[1] = _filedir2;
     _M_read_file(0);
@@ -16,13 +17,32 @@ LCS::LCS(const string &_filedir1, const string &_filedir2)
 void LCS::_M_read_file(const int &whichfile)
 {
     _M_hashline[whichfile].clear();
+    if (_M_format == 2)
+    {
+        string ext = _M_filedir[whichfile].substr(_M_filedir[whichfile].find('.'));
+        if (ext == ".cpp" || ext == ".hpp" || ext == ".c" || ext == ".h" || ext == ".cc")
+        {
+            string p("clang-format -i -style=llvm ");
+            p.append(_M_filedir[whichfile]);
+            system(p.c_str());
+        }
+    }
     std::ifstream _M_file;
     _M_file.open(_M_filedir[whichfile], std::ios::in);
     if (_M_file.good())
     {
         string s;
         while (getline(_M_file, s))
+        {
+            if (_M_format == 1)
+            {
+                if (s.empty())
+                    continue;
+                s.erase(0, s.find_first_not_of(" "));
+                s.erase(s.find_last_not_of(" ") + 1);
+            }
             _M_hashline[whichfile].push_back(_M_diff_hasher(s));
+        }
     }
 }
 void LCS::_M_update()
@@ -65,7 +85,7 @@ void LCS::print_diff()
         if (Ar - Al > 1 && Br - Bl != 1)
         {
             flag = 1;
-            cout << "modify ";
+            cout << "\tmodify ";
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1;
             else
@@ -78,8 +98,7 @@ void LCS::print_diff()
         }
         else if (Ar - Al > 1 && Br - Bl == 1)
         {
-            flag = 1;
-            cout << "delete ";
+            cout << "\tdelete ";
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1 << endl;
             else
@@ -87,8 +106,7 @@ void LCS::print_diff()
         }
         else if (Ar - Al == 1 && Br - Bl > 1)
         {
-            flag = 1;
-            cout << "add ";
+            cout << "\tadd ";
             if (Br - Bl > 2)
                 cout << "line in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
             else
@@ -96,7 +114,7 @@ void LCS::print_diff()
         }
     }
     if (flag == 0)
-        cout << "Nothing different." << endl;
+        cout << "\tNothing different." << endl;
 }
 void LCS::print_same()
 {
