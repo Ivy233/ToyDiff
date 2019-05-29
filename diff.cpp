@@ -11,38 +11,48 @@
 #include <bits/stdc++.h>
 using namespace std;
 //存储结果
-vector<LCS> results;
+const string _C_basicformat = "-basicformat";
+const string _C_format = "-format";
 int main(int argc, char **argv)
 {
-    string filedir[2];
     int format = 0;
-    if (argc == 4) //如果多余四个则认为第四个为format参数
+    vector<string> vec_argv;
+    vector<LCS> results;
+    string filedir[2];
+    int filecnt = 0;
+
+    // 整理所有命令行参数
+    for (int i = 1; i < argc; i++)
     {
-        filedir[0] = argv[1];
-        filedir[1] = argv[2];
-        if (strcmp(argv[3], "-basicformat") == 0)
-            format = 1;
-        else if (strcmp(argv[3], "-format") == 0)
-            format = 2;
+        filedir[0] = argv[i];
+        vec_argv.push_back(filedir[0]);
     }
-    else if (argc == 3) //三个命令行参数
+    // 检测特定命令行参数是否存在
+    if (find(vec_argv.begin(), vec_argv.end(), _C_basicformat) != vec_argv.end())
+        format = 1;
+    else if (find(vec_argv.begin(), vec_argv.end(), _C_format) != vec_argv.end())
+        format = 2;
+    else
+        format = 0;
+    // 考虑剩下的命令行参数
+    for (const string &tmp_argv : vec_argv)
     {
-        filedir[0] = argv[1];
-        filedir[1] = argv[2];
+        // 控制参数一般以-开头
+        if (tmp_argv[0] != '-')
+            filedir[filecnt++] = tmp_argv;
+        // 到比较上限则跳出
+        if (filecnt == 2)
+            break;
     }
-    else if (argc == 2) //两个命令行参数
+    //如果参数不足则额外输入
+    while (filecnt < 2)
     {
-        filedir[0] = argv[1];
-        cout << "enter the dir of filedir[1]" << endl;
-        getline(cin, filedir[1]);
+        cout << "input filedir[" << filecnt << "]: " << endl;
+        cin >> filedir[filecnt++];
     }
-    else //啥文件都没有
-    {
-        cout << "enter the dir of filedir[0]" << endl;
-        getline(cin, filedir[0]);
-        cout << "enter the dir of filedir[1]" << endl;
-        getline(cin, filedir[1]);
-    }
+    cout << format << endl
+         << filedir[0] << endl
+         << filedir[1] << endl;
     Folder A(filedir[0]), B(filedir[1]);
     link(A, B, results, format);
     for (LCS result : results)

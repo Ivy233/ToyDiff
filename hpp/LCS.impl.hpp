@@ -129,7 +129,7 @@ void LCS::print_diff()
         if (Ar - Al > 1 && Br - Bl != 1)
         {
             flag = 1;
-            cout << "\tmodify ";
+            cout << "    modify ";
             //超过一行
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1;
@@ -146,7 +146,7 @@ void LCS::print_diff()
         else if (Ar - Al > 1 && Br - Bl == 1)
         {
             flag = 1;
-            cout << "\tdelete ";
+            cout << "    delete ";
             if (Ar - Al > 2)
                 cout << "line in A:" << Al + 1 << " ~ " << Ar - 1 << endl;
             else
@@ -155,7 +155,7 @@ void LCS::print_diff()
         else if (Ar - Al == 1 && Br - Bl > 1)
         {
             flag = 1;
-            cout << "\tadd ";
+            cout << "    add ";
             if (Br - Bl > 2)
                 cout << "line in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
             else
@@ -163,7 +163,7 @@ void LCS::print_diff()
         }
     }
     if (flag == 0)
-        cout << "\tNothing different." << endl
+        cout << "    Nothing different." << endl
              << endl;
 }
 /*
@@ -172,7 +172,7 @@ void LCS::print_diff()
  */
 void LCS::print_same()
 {
-    for (pair<size_type, size_type> line : _M_same_line)
+    for (const pair<size_type, size_type> &line : _M_same_line)
         cout << line.first << " " << line.second << endl;
 }
 /*
