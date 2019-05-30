@@ -10,6 +10,7 @@
 //就算没有重复包含也建议有，这是代码习惯
 #ifndef _LCS_HPP_
 #define _LCS_HPP_
+#define _M_cnt_cmds 6
 #include <functional>
 #include <string>
 #include <vector>
@@ -40,14 +41,17 @@ private:
 
 private:
     string _M_filedir[2];                            //两个文件的路径
-    vector<value_type> _M_hashline[2];               //读取结果，行hash
+    vector<value_type> _M_hashline[2];               //源文件经过格式化处理之后的hash值
+    vector<string> _M_line[2];                       //源文件的内容
     vector<pair<size_type, size_type>> _M_same_line; //比较结果
-    int _M_format;                                   //比较之前的格式化方式
-    void _M_update();                                //LCS更新
-    void _M_read_file(const int &file_switch);       //读取文件
+    bool _M_cmds[_M_cnt_cmds];                       //比较之前的格式化方式
+
+private:
+    void _M_update();                          //LCS更新
+    void _M_read_file(const int &file_switch); //读取文件
 
 public:
-    LCS(const string &_filedir1, const string &_filedir2, const int &_format);
+    LCS(const string &_filedir1, const string &_filedir2, const bool *const _cmds);
     void print_same();                                               //输出相同的行，调试功能
     void print_diff();                                               //输出不同的行，有功能
     void swapfile();                                                 //交换文件，这会交换LCS结果

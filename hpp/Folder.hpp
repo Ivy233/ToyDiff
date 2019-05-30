@@ -40,7 +40,8 @@ public:
     Folder(const string &filedir); //此处会同时调用两个私有化函数
     void print_everything();       //验证用
     bool is_only_file() const { return _M_only_file; }
-    friend void link(const Folder &A, const Folder &B, vector<LCS> &results, const int &_format); //友元函数，方便访问内部内容
+    //友元函数，方便访问内部内容
+    friend void link(const Folder &A, const Folder &B, vector<LCS> &results, const bool *const _cmds);
 };
 #include "Folder.impl.hpp" //实现hpp
 #endif

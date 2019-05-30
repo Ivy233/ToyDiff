@@ -11,50 +11,58 @@
 #include <bits/stdc++.h>
 using namespace std;
 //存储结果
-const string _C_basicformat = "-basicformat";
-const string _C_format = "-format";
+const string _C_format = "--format";                         //代码格式化
+const string _C_ignore_space = "--ignore-space";             //行前与行后空格
+const string _C_ignore_all_space = "--ignore-all-space";     //所有空格(包括代码内的)
+const string _C_ignore_blank_lines = "--ignore-blank-lines"; //空行
+const string _C_ignore_tabs = "--ignore-tabs";               //所有tab
 int main(int argc, char **argv)
 {
-    int format = 0;
-    vector<string> vec_argv;
     vector<LCS> results;
-    string filedir[2];
-    int filecnt = 0;
+    bool _cmds[5] = {0};
+    /*
+     * 0: _cmd_format
+     * 1: _cmd_ignore_space
+     * 2: _cmd_ignore_all_space
+     * 3: _cmd_ignore_blank_lines
+     * 4: _cmd_ignore_tabs
+    */
+    vector<string> _argvs;
+    string _file_dir[3];
+    int _file_cnt = 0;
 
     // 整理所有命令行参数
     for (int i = 1; i < argc; i++)
     {
-        filedir[0] = argv[i];
-        vec_argv.push_back(filedir[0]);
+        _file_dir[0] = argv[i];
+        _argvs.push_back(_file_dir[0]);
     }
-    // 检测特定命令行参数是否存在
-    if (find(vec_argv.begin(), vec_argv.end(), _C_basicformat) != vec_argv.end())
-        format = 1;
-    else if (find(vec_argv.begin(), vec_argv.end(), _C_format) != vec_argv.end())
-        format = 2;
-    else
-        format = 0;
-    // 考虑剩下的命令行参数
-    for (const string &tmp_argv : vec_argv)
+    for (const string &_argv : _argvs)
     {
-        // 控制参数一般以-开头
-        if (tmp_argv[0] != '-')
-            filedir[filecnt++] = tmp_argv;
-        // 到比较上限则跳出
-        if (filecnt == 2)
-            break;
+        if (_argv == _C_format)
+            _cmds[0] = 1;
+        else if (_argv == _C_ignore_space)
+            _cmds[1] = 1;
+        else if (_argv == _C_ignore_all_space)
+            _cmds[2] = 1;
+        else if (_argv == _C_ignore_blank_lines)
+            _cmds[3] = 1;
+        else if (_argv == _C_ignore_tabs)
+            _cmds[4] = 1;
+        else if (_file_cnt < 3 && _argv[0] != '-')
+            _file_dir[_file_cnt++] = _argv;
     }
     //如果参数不足则额外输入
-    while (filecnt < 2)
+    while (_file_cnt < 2)
     {
-        cout << "input filedir[" << filecnt << "]: " << endl;
-        cin >> filedir[filecnt++];
+        cout << "input filedir[" << _file_cnt << "]: " << endl;
+        cin >> _file_dir[_file_cnt++];
     }
-    cout << format << endl
-         << filedir[0] << endl
-         << filedir[1] << endl;
-    Folder A(filedir[0]), B(filedir[1]);
-    link(A, B, results, format);
+    cout << _file_dir[0] << endl
+         << _file_dir[1] << endl;
+
+    Folder A(_file_dir[0]), B(_file_dir[1]);
+    link(A, B, results, _cmds);
     for (LCS result : results)
         result.print_diff();
     return 0;

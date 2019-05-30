@@ -21,9 +21,10 @@ using std::endl;
  * Input: 两个文件路径，格式化方式
  * Calls: _M_readfile, _M_update
  */
-LCS::LCS(const string &_filedir1, const string &_filedir2, const int &_format)
+LCS::LCS(const string &_filedir1, const string &_filedir2, const bool *const _cmds)
 {
-    _M_format = _format;
+    for (int i = 0; i < _M_cnt_cmds; i++)
+        _M_cmds[i] = _cmds[i];
     _M_filedir[0] = _filedir1;
     _M_filedir[1] = _filedir2;
     _M_read_file(0);
@@ -40,7 +41,7 @@ void LCS::_M_read_file(const int &whichfile)
     //hashline清空
     _M_hashline[whichfile].clear();
     //如果需要文件格式化
-    if (_M_format == 2)
+    if (_M_cmds[0])
     {
         //得到后缀名
         string ext = _M_filedir[whichfile].substr(_M_filedir[whichfile].find('.'));
@@ -61,12 +62,30 @@ void LCS::_M_read_file(const int &whichfile)
         string s;
         while (getline(_M_file, s)) //按行读取
         {
-            if (_M_format == 1) //如果需要基本格式化
+            _M_line[whichfile].push_back(s);
+            if (_M_cmds[1])
             {
-                if (s.empty()) //空行滤过
-                    continue;
                 s.erase(0, s.find_first_not_of(" ")); //行前空格滤过
                 s.erase(s.find_last_not_of(" ") + 1); //行后空格滤过
+            }
+            if (_M_cmds[2])
+            {
+                string tmp(s);
+                for (const char &x : tmp)
+                    if (x != ' ')
+                        s.push_back(x);
+            }
+            if (_M_cmds[4])
+            {
+                string tmp(s);
+                for (const char &x : tmp)
+                    if (x != '\t')
+                        s.push_back(x);
+            }
+            if (_M_cmds[3])
+            {
+                if (s.empty())
+                    continue;
             }
             _M_hashline[whichfile].push_back(_M_diff_hasher(s)); //按行hash加入结果
         }
