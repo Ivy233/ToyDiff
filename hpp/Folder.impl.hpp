@@ -2,8 +2,8 @@
  * File name: Folder.impl.hpp
  * Description: 文件夹类，用于捕捉所有文件夹下的非隐藏文件
  * Author: 王锦润
- * Version: 1
- * Date: 2019.5.27
+ * Version: 2
+ * Date: 2019.6.11
  * History: 此程序被纳入git，可以直接使用git查询。
  */
 //防卫式声明，必须要有
@@ -11,6 +11,7 @@
 #ifndef _FOLDER_IMPL_HPP_
 #define _FOLDER_IMPL_HPP_
 #include "Folder.hpp"
+#include <algorithm>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -26,6 +27,8 @@ Folder::Folder(const string &filedir)
     _M_update_base(filedir);                     //然后尝试更新文件夹路径
     if (_M_only_file == 0 && _M_base_dir.size()) //如果更新成功，更新所有文件
         _M_update_ext("");
+    //此处排序复杂度接近于线性，主要原因在于操作系统给出的文件句柄顺序
+    std::sort(_M_ext_dirs.begin(), _M_ext_dirs.end()); //排序使得有集合性质，方便调用差集，交集等集合运算
 }
 /*
  * Function: print_everything

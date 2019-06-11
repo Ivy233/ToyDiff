@@ -2,8 +2,8 @@
  * File name: Folder.hpp
  * Description: 文件夹类，用于捕捉所有文件夹下的非隐藏文件
  * Author: 王锦润
- * Version: 1
- * Date: 2019.5.27
+ * Version: 2
+ * Date: 2019.6.11
  * History: 此程序被纳入git，可以直接使用git查询。
  */
 //防卫式声明，必须要有
@@ -34,13 +34,12 @@ private:
     //私有化更新，防止外部随意调用
     void _M_update_base(const string &filedir);
     void _M_update_ext(const string &dir);
-    Folder() {}
+    Folder() {} //私有化构造函数，防止默认构造
 
 public:
-    Folder(const string &filedir); //此处会同时调用两个私有化函数
-    void print_everything();       //验证用
-    bool is_only_file() const { return _M_only_file; }
-    friend class Compare;
+    Folder(const string &filedir);
+    void print_everything(); //验证用
+    friend class Compare;    //友元类，因为发现Compare需要大量使用类中内容。
 };
 #include "Folder.impl.hpp" //实现hpp
 #endif

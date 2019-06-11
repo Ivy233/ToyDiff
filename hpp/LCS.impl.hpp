@@ -2,8 +2,8 @@
  * File name: LCS.impl.hpp
  * Description: 文件夹类，用于捕捉所有文件夹下的非隐藏文件
  * Author: 王锦润
- * Version: 1
- * Date: 2019.5.27
+ * Version: 2
+ * Date: 2019.6.11
  * History: 此程序被纳入git，可以直接使用git查询。
  */
 //防卫式声明，必须要有
@@ -13,11 +13,22 @@
 #include "LCS.hpp"
 #include <cstdlib>
 #include <cstring>
-#include <direct.h>
 #include <fstream>
 #include <functional>
-#include <io.h>
 #include <iostream>
+
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#define MKDIR(a) _mkdir((a))
+#define ACCESS _access
+#elif _LINUX
+#include <stdarg.h>
+#include <sys/stat.h>
+#define ACCESS access
+#define MKDIR(a) mkdir((a), 0777)
+#endif
+
 using std::cout;
 using std::endl;
 /*
@@ -35,22 +46,27 @@ LCS::LCS(const string &_filedir1, const string &_filedir2, bool *_cmds)
     _M_read_file(1);
     _M_update();
 }
+/*
+ * Function: _M_smkdir
+ * Description: 递归创建文件夹，支持linux和windows，如果编译错误请在_LINUX修改
+ * Input: 文件路径
+ */
 void LCS::_M_smkdir(string _newdir)
 {
     int i, len;
     len = _newdir.size();
     for (i = 0; i < len; i++)
     {
-        if (_newdir[i] == '/' || _newdir[i] == '\\')
+        if (_newdir[i] == '/' || _newdir[i] == '\\') //遇到文件夹符号
         {
-            _newdir[i] = '\0';
-            if (_access(_newdir.c_str(), 0) != 0)
-                _mkdir(_newdir.c_str());
-            _newdir[i] = '\\';
+            _newdir[i] = '\0'; //修改以方便访问
+            if (ACCESS(_newdir.c_str(), 0) != 0)
+                MKDIR(_newdir.c_str());
+            _newdir[i] = '\\'; //改回去
         }
     }
-    if (len > 0 && _access(_newdir.c_str(), 0) != 0)
-        _mkdir(_newdir.c_str());
+    if (len > 0 && ACCESS(_newdir.c_str(), 0) != 0)
+        MKDIR(_newdir.c_str());
 }
 /*
  * Function: _M_read_file
@@ -89,21 +105,21 @@ void LCS::_M_read_file(const int &whichfile)
                 s.erase(0, s.find_first_not_of(" ")); //行前空格滤过
                 s.erase(s.find_last_not_of(" ") + 1); //行后空格滤过
             }
-            if (_M_cmds[2])
+            if (_M_cmds[2]) //换掉所有空格
             {
                 string tmp(s);
                 for (const char &x : tmp)
                     if (x != ' ')
                         s.push_back(x);
             }
-            if (_M_cmds[4])
+            if (_M_cmds[4]) //换掉所有\t
             {
                 string tmp(s);
                 for (const char &x : tmp)
                     if (x != '\t')
                         s.push_back(x);
             }
-            if (_M_cmds[3])
+            if (_M_cmds[3]) //换掉空行
             {
                 if (s.empty())
                     continue;
@@ -245,32 +261,29 @@ void LCS::merge(const string &_merge2where)
 {
     std::ofstream outputfile;
     size_type length = std::max(_merge2where.find_last_of('/') + 1, _merge2where.find_last_of('\\') + 1) - 1;
-    cout << _merge2where << endl;
-    _M_smkdir(_merge2where.substr(0, length));
+    _M_smkdir(_merge2where.substr(0, length)); //新建文件夹
     outputfile.open(_merge2where.c_str(), std::ios::out);
     for (size_type i = 1, Al, Ar, Bl, Br; i < _M_same_line.size(); i++)
     {
         Ar = _M_same_line[i].first, Br = _M_same_line[i].second;
         Al = _M_same_line[i - 1].first, Bl = _M_same_line[i - 1].second;
-        cout << i << ":" << Ar << " " << Br << " " << Al << " " << Bl << _M_line[1].size() << endl;
         if (Ar - Al == 1 && Br - Bl == 1)
         {
-            if (i == _M_same_line.size() - 1)
+            if (i == _M_same_line.size() - 1) //由于有双哨兵的存在，此处多余
                 break;
             outputfile << _M_line[1][Br - 1] << endl;
         }
         else
         {
             outputfile << "<===============In File A================" << endl;
-            for (size_type l = Al; l < Ar; l++)
+            for (size_type l = Al; l < Ar; l++) //这里的1是一个坑点，建议画图分析
                 outputfile << _M_line[0][l] << endl;
             outputfile << "================In File B================" << endl;
             for (size_type l = Bl; l < Br; l++)
                 outputfile << _M_line[1][l] << endl;
             outputfile << "========================================>" << endl;
         }
-        cout << i << ":" << Ar << " " << Br << " " << Al << " " << Bl << endl;
     }
-    outputfile.close();
+    outputfile.close(); //关闭文件
 }
 #endif

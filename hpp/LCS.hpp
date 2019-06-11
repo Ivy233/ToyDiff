@@ -2,8 +2,8 @@
  * File name: LCS.hpp
  * Description: 比较类，用于比较两个文件
  * Author: 王锦润
- * Version: 1
- * Date: 2019.5.27
+ * Version: 2
+ * Date: 2019.6.11
  * History: 此程序被纳入git，可以直接使用git查询。
  */
 //防卫式声明，必须要有

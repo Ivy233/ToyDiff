@@ -1,9 +1,9 @@
 /*
  * File name: diff.cpp
- * Description: Folder.hpp, LCS.hpp的接口
+ * Description: Compare.hpp的接口，加入了合并功能，自动识别是否需要合并
  * Author: 王锦润
- * Version: 1
- * Date: 2019.5.27
+ * Version: 2
+ * Date: 2019.6.11
  * History: 此程序被纳入git，可以直接使用git查询。
  */
 #include "hpp/Compare.hpp"
