@@ -6,8 +6,7 @@
  * Date: 2019.5.27
  * History: 此程序被纳入git，可以直接使用git查询。
  */
-#include "hpp/Folder.hpp"
-#include "hpp/LCS.hpp"
+#include "hpp/Compare.hpp"
 #include <bits/stdc++.h>
 using namespace std;
 //存储结果
@@ -18,8 +17,6 @@ const string _C_ignore_blank_lines = "--ignore-blank-lines"; //空行
 const string _C_ignore_tabs = "--ignore-tabs";               //所有tab
 int main(int argc, char **argv)
 {
-    vector<LCS> results;
-    bool _cmds[5] = {0};
     /*
      * 0: _cmd_format
      * 1: _cmd_ignore_space
@@ -27,6 +24,7 @@ int main(int argc, char **argv)
      * 3: _cmd_ignore_blank_lines
      * 4: _cmd_ignore_tabs
     */
+    bool _cmds[_M_cnt_cmds] = {0};
     vector<string> _argvs;
     string _file_dir[3];
     int _file_cnt = 0;
@@ -61,9 +59,11 @@ int main(int argc, char **argv)
     cout << _file_dir[0] << endl
          << _file_dir[1] << endl;
 
-    Folder A(_file_dir[0]), B(_file_dir[1]);
-    link(A, B, results, _cmds);
-    for (LCS result : results)
-        result.print_diff();
+    Compare cmp;
+    if (_file_cnt == 2)
+        cmp = Compare(_file_dir[0], _file_dir[1], _cmds);
+    else if (_file_cnt == 3)
+        cmp = Compare(_file_dir[0], _file_dir[1], _file_dir[2]);
+    cmp.print();
     return 0;
 }

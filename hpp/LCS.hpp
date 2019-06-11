@@ -10,8 +10,6 @@
 //就算没有重复包含也建议有，这是代码习惯
 #ifndef _LCS_HPP_
 #define _LCS_HPP_
-#define _M_cnt_cmds 6
-#include <functional>
 #include <string>
 #include <vector>
 using std::pair;
@@ -44,18 +42,21 @@ private:
     vector<value_type> _M_hashline[2];               //源文件经过格式化处理之后的hash值
     vector<string> _M_line[2];                       //源文件的内容
     vector<pair<size_type, size_type>> _M_same_line; //比较结果
-    bool _M_cmds[_M_cnt_cmds];                       //比较之前的格式化方式
+    bool *_M_cmds;                                   //比较之前的格式化方式
 
 private:
     void _M_update();                          //LCS更新
     void _M_read_file(const int &file_switch); //读取文件
+    void _M_smkdir(string _newdir);            //创建文件夹
+    LCS() {}
 
 public:
-    LCS(const string &_filedir1, const string &_filedir2, const bool *const _cmds);
+    LCS(const string &_filedir1, const string &_filedir2, bool *_cmds);
     void print_same();                                               //输出相同的行，调试功能
     void print_diff();                                               //输出不同的行，有功能
     void swapfile();                                                 //交换文件，这会交换LCS结果
     void modifyfile(const string &newfiledir, const int &whichfile); //更改文件路径，这会重新计算LCS
+    void merge(const string &_merge2where);                          //合并
 };
 #include "LCS.impl.hpp"
 #endif

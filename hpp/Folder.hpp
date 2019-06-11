@@ -11,7 +11,6 @@
 #ifndef _FOLDER_HPP_
 #define _FOLDER_HPP_
 //friend成员函数导致必须要包含
-#include "LCS.hpp"
 #include <io.h>
 #include <string>
 #include <vector>
@@ -35,13 +34,13 @@ private:
     //私有化更新，防止外部随意调用
     void _M_update_base(const string &filedir);
     void _M_update_ext(const string &dir);
+    Folder() {}
 
 public:
     Folder(const string &filedir); //此处会同时调用两个私有化函数
     void print_everything();       //验证用
     bool is_only_file() const { return _M_only_file; }
-    //友元函数，方便访问内部内容
-    friend void link(const Folder &A, const Folder &B, vector<LCS> &results, const bool *const _cmds);
+    friend class Compare;
 };
 #include "Folder.impl.hpp" //实现hpp
 #endif

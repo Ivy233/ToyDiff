@@ -99,28 +99,4 @@ void Folder::_M_update_ext(const string &dir)
         } while (_findnext(hfile, &fileinfo) == 0); //句柄的用处
     }
 }
-/*
- * Function: link
- * Description: 连接两个文件
- * Input: 两个Folder和比较之前的格式化方法
- * Output: LCS结果数组
- */
-void link(const Folder &A, const Folder &B, vector<LCS> &results, const bool *const _cmds)
-{
-    results.clear();                      //清空
-    if (A._M_only_file && B._M_only_file) //如果都是单一文件，则无视文件名强制比较
-        results.push_back(LCS(A._M_base_dir + A._M_ext_dirs[0], B._M_base_dir + B._M_ext_dirs[0], _cmds));
-    else
-    {
-        //取两者交集进行比较
-        //看起来使用set更加合适
-        for (string ext_dir : A._M_ext_dirs)
-        {
-            //只是简化代码而已
-            size_t pos = std::find(B._M_ext_dirs.begin(), B._M_ext_dirs.end(), ext_dir) - B._M_ext_dirs.begin();
-            if (pos != B._M_ext_dirs.size())
-                results.push_back(LCS(A._M_base_dir + ext_dir, B._M_base_dir + B._M_ext_dirs[pos], _cmds));
-        }
-    }
-}
 #endif

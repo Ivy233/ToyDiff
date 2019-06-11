@@ -11,7 +11,12 @@
 #ifndef _LCS_IMPL_HPP_
 #define _LCS_IMPL_HPP_
 #include "LCS.hpp"
+#include <cstdlib>
+#include <cstring>
+#include <direct.h>
 #include <fstream>
+#include <functional>
+#include <io.h>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -21,15 +26,31 @@ using std::endl;
  * Input: 两个文件路径，格式化方式
  * Calls: _M_readfile, _M_update
  */
-LCS::LCS(const string &_filedir1, const string &_filedir2, const bool *const _cmds)
+LCS::LCS(const string &_filedir1, const string &_filedir2, bool *_cmds)
 {
-    for (int i = 0; i < _M_cnt_cmds; i++)
-        _M_cmds[i] = _cmds[i];
+    _M_cmds = _cmds;
     _M_filedir[0] = _filedir1;
     _M_filedir[1] = _filedir2;
     _M_read_file(0);
     _M_read_file(1);
     _M_update();
+}
+void LCS::_M_smkdir(string _newdir)
+{
+    int i, len;
+    len = _newdir.size();
+    for (i = 0; i < len; i++)
+    {
+        if (_newdir[i] == '/' || _newdir[i] == '\\')
+        {
+            _newdir[i] = '\0';
+            if (_access(_newdir.c_str(), 0) != 0)
+                _mkdir(_newdir.c_str());
+            _newdir[i] = '\\';
+        }
+    }
+    if (len > 0 && _access(_newdir.c_str(), 0) != 0)
+        _mkdir(_newdir.c_str());
 }
 /*
  * Function: _M_read_file
@@ -44,7 +65,7 @@ void LCS::_M_read_file(const int &whichfile)
     if (_M_cmds[0])
     {
         //得到后缀名
-        string ext = _M_filedir[whichfile].substr(_M_filedir[whichfile].find('.'));
+        string ext = _M_filedir[whichfile].substr(_M_filedir[whichfile].find_last_of('.'));
         //如果是clang-format可识别后缀
         if (ext == ".cpp" || ext == ".hpp" || ext == ".c" || ext == ".h" || ext == ".cc")
         {
@@ -151,13 +172,13 @@ void LCS::print_diff()
             cout << "    modify ";
             //超过一行
             if (Ar - Al > 2)
-                cout << "line in A:" << Al + 1 << " ~ " << Ar - 1;
+                cout << "lines in A:" << Al + 1 << " ~ " << Ar - 1;
             //只有一行
             else
                 cout << "line in A:" << Al + 1;
             cout << " <======> ";
             if (Br - Bl > 2)
-                cout << "line in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
+                cout << "lines in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
             else
                 cout << "line in B:" << Bl + 1 << endl;
         }
@@ -167,7 +188,7 @@ void LCS::print_diff()
             flag = 1;
             cout << "    delete ";
             if (Ar - Al > 2)
-                cout << "line in A:" << Al + 1 << " ~ " << Ar - 1 << endl;
+                cout << "lines in A:" << Al + 1 << " ~ " << Ar - 1 << endl;
             else
                 cout << "line in A:" << Al + 1 << endl;
         } //添加
@@ -176,14 +197,13 @@ void LCS::print_diff()
             flag = 1;
             cout << "    add ";
             if (Br - Bl > 2)
-                cout << "line in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
+                cout << "lines in B:" << Bl + 1 << " ~ " << Br - 1 << endl;
             else
                 cout << "line in B:" << Bl + 1 << endl;
         }
     }
     if (flag == 0)
-        cout << "    Nothing different." << endl
-             << endl;
+        cout << "    Nothing different." << endl;
 }
 /*
  * Function: print_same
@@ -215,5 +235,42 @@ void LCS::modifyfile(const string &_newfiledir, const int &whichfile)
     _M_filedir[whichfile] = _newfiledir;
     _M_read_file(whichfile); //重新读取文件
     _M_update();             //重新LCS
+}
+/*
+ * Function: merge
+ * Description: 合并到确定地方
+ * Input: 新的文件路径，修改哪个文件
+ */
+void LCS::merge(const string &_merge2where)
+{
+    std::ofstream outputfile;
+    size_type length = std::max(_merge2where.find_last_of('/') + 1, _merge2where.find_last_of('\\') + 1) - 1;
+    cout << _merge2where << endl;
+    _M_smkdir(_merge2where.substr(0, length));
+    outputfile.open(_merge2where.c_str(), std::ios::out);
+    for (size_type i = 1, Al, Ar, Bl, Br; i < _M_same_line.size(); i++)
+    {
+        Ar = _M_same_line[i].first, Br = _M_same_line[i].second;
+        Al = _M_same_line[i - 1].first, Bl = _M_same_line[i - 1].second;
+        cout << i << ":" << Ar << " " << Br << " " << Al << " " << Bl << _M_line[1].size() << endl;
+        if (Ar - Al == 1 && Br - Bl == 1)
+        {
+            if (i == _M_same_line.size() - 1)
+                break;
+            outputfile << _M_line[1][Br - 1] << endl;
+        }
+        else
+        {
+            outputfile << "<===============In File A================" << endl;
+            for (size_type l = Al; l < Ar; l++)
+                outputfile << _M_line[0][l] << endl;
+            outputfile << "================In File B================" << endl;
+            for (size_type l = Bl; l < Br; l++)
+                outputfile << _M_line[1][l] << endl;
+            outputfile << "========================================>" << endl;
+        }
+        cout << i << ":" << Ar << " " << Br << " " << Al << " " << Bl << endl;
+    }
+    outputfile.close();
 }
 #endif
